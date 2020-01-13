@@ -1,0 +1,3 @@
+./smvflatten ./examples/smv/s2cfair.smv
+
+./smvtoaig -L ./ltl2smv ./examples/smv/s2cunfair.flatsmv

@@ -1,0 +1,335 @@
+MODULE main
+VAR
+  running@4 : boolean; --TYPE-- lose_ack lose_msg main read_K read_L_MANY read_L_ONE read_conf read_ind read_ind_error read_req rtimer stimer2 stimerTRUE_QUIT stimerTRUE_RETRY write_K write_L write_conf write_ind write_ind_error write_req
+  running@3 : boolean;
+  running@2 : boolean;
+  running@1 : boolean;
+  running@0 : boolean;
+  s.K.first : boolean;
+  s.K.last : boolean;
+  s.K.toggle : boolean;
+  s.K_full : boolean;
+  s.L : boolean;
+  s.req@1 : boolean; --TYPE-- MANY NONE ONE
+  s.req@0 : boolean;
+  s.req_full : boolean;
+  s.conf@1 : boolean; --TYPE-- DONT_KNOW NOT_OK OK
+  s.conf@0 : boolean;
+  s.conf_full : boolean;
+  s.spc@2 : boolean; --TYPE-- SC SF WA WR WT2
+  s.spc@1 : boolean;
+  s.spc@0 : boolean;
+  s.sfirst : boolean;
+  s.stoggle : boolean;
+  s.file@1 : boolean; --TYPE-- MANY NONE ONE
+  s.file@0 : boolean;
+  s.rn : boolean;
+  s.stimerTRUE_on : boolean;
+  s.stimerTRUE_enabled : boolean;
+  s.stimer2_on : boolean;
+  s.stimer2_enabled : boolean;
+  s.ind_indication@1 : boolean; --TYPE-- FIRST INCOMPLETE LAST
+  s.ind_indication@0 : boolean;
+  s.ind_full : boolean;
+  s.ind_error : boolean;
+  s.rpc@2 : boolean; --TYPE-- NOK RTS SA SI WF
+  s.rpc@1 : boolean;
+  s.rpc@0 : boolean;
+  s.rfirst : boolean;
+  s.rtoggle : boolean;
+  s.ctoggle : boolean;
+  s.msg.first : boolean;
+  s.msg.last : boolean;
+  s.msg.toggle : boolean;
+  s.rtimer_on : boolean;
+  s.rtimer_enabled : boolean;
+  s.abusy : boolean;
+  s.afile : boolean;
+  s.afirst : boolean;
+  s.aerror : boolean;
+  s.data_is_safe : boolean;
+  s.SAFE : boolean;
+  read_K.new : boolean;
+DEFINE
+  .MACRO0 := !s.file@1 & s.file@0;
+  write_conf.empty := .MACRO0;
+  .MACRO4 := running@1 | !running@0;
+  .MACRO3 := running@2 | .MACRO4;
+  .MACRO2 := !running@3 | .MACRO3;
+  .MACRO1 := running@4 | .MACRO2;
+  .MACRO8 := running@1 & running@0;
+  .MACRO7 := !running@2 & .MACRO8;
+  .MACRO6 := !running@3 & .MACRO7;
+  .MACRO5 := running@4 & .MACRO6;
+  .MACRO12 := !running@1 | running@0;
+  .MACRO11 := !running@2 | .MACRO12;
+  .MACRO10 := !running@3 | .MACRO11;
+  .MACRO9 := running@4 | .MACRO10;
+  .MACRO13 := s.file@1 & !s.file@0;
+  .MACRO17 := !running@1 & !running@0;
+  .MACRO16 := !running@2 & .MACRO17;
+  .MACRO15 := !running@3 & .MACRO16;
+  .MACRO14 := running@4 & .MACRO15;
+  .MACRO18 := !s.rn | !.MACRO13;
+  .MACRO21 := running@2 & !.MACRO4;
+  .MACRO20 := !running@3 & .MACRO21;
+  .MACRO19 := !running@4 & .MACRO20;
+  .MACRO24 := running@2 & .MACRO17;
+  .MACRO23 := !running@3 & .MACRO24;
+  .MACRO22 := !running@4 & .MACRO23;
+  .MACRO27 := !s.file@1 & !s.file@0;
+  .MACRO26 := !.MACRO13 & .MACRO27;
+  .MACRO25 := !.MACRO0 & .MACRO26;
+  .MACRO29 := !running@3 | !.MACRO21;
+  .MACRO28 := running@4 | .MACRO29;
+  .MACRO31 := !running@3 | !.MACRO24;
+  .MACRO30 := running@4 | .MACRO31;
+  .MACRO32 := !running@4 & .MACRO15;
+  .MACRO34 := !running@3 & !.MACRO3;
+  .MACRO33 := !running@4 & .MACRO34;
+  .MACRO36 := !running@3 | !.MACRO7;
+  .MACRO35 := running@4 | .MACRO36;
+  .MACRO37 := running@4 | !.MACRO6;
+  .MACRO38 := running@4 & .MACRO34;
+  .MACRO39 := !running@2 | !.MACRO8;
+  .MACRO40 := s.msg.last | !.MACRO38;
+  .MACRO42 := running@3 & !.MACRO39;
+  .MACRO41 := !running@4 & .MACRO42;
+  .MACRO45 := !running@2 & !.MACRO12;
+  .MACRO44 := !running@3 & .MACRO45;
+  .MACRO43 := running@4 & .MACRO44;
+  .MACRO47 := !running@3 | !.MACRO16;
+  .MACRO46 := running@4 | .MACRO47;
+  .MACRO49 := !running@3 | !.MACRO45;
+  .MACRO48 := running@4 | .MACRO49;
+  .MACRO50 := running@3 | running@2;
+  .MACRO51 := running@4 | !.MACRO8;
+  .MACRO52 := !running@4 | !.MACRO17;
+  .MACRO53 := s.spc@1 | !s.spc@0;
+  .MACRO54 := s.abusy & !s.aerror;
+  .MACRO57 := s.spc@1 & !s.spc@0;
+  .MACRO56 := !s.spc@2 & .MACRO57;
+  .MACRO55 := s.L & .MACRO56;
+  .MACRO58 := s.stimerTRUE_enabled & s.stimerTRUE_on;
+  .MACRO59 := !s.rpc@1 & !s.rpc@0;
+ASSIGN
+  next(s.req_full) := .MACRO1 & (s.req_full | .MACRO5);
+  next(s.K.first) := (s.sfirst | .MACRO9) & (s.K.first | !.MACRO9);
+  next(s.K.last) := (.MACRO9 | .MACRO13) & (s.K.last | !.MACRO9);
+  next(s.K.toggle) := (s.stoggle | .MACRO9) & (s.K.toggle | !.MACRO9);
+  next(s.conf_full) := .MACRO14 | s.conf_full & (running@4 | running@3 | .MACRO11);
+  next(s.conf@1) := (.MACRO0 | !.MACRO14) & (s.conf@1 | .MACRO14);
+  next(s.conf@0) := (!.MACRO14 | !.MACRO0 & .MACRO18) & (s.conf@0 | .MACRO14);
+  next(s.sfirst) :=
+    case
+      .MACRO14 : s.sfirst | !write_conf.empty;
+      .MACRO19 : .MACRO13;
+      .MACRO22 : .MACRO13;
+      TRUE : s.sfirst;
+    esac;
+  next(s.stoggle) :=
+    case
+      .MACRO14 : s.stoggle <-> write_conf.empty;
+      .MACRO19 : !s.stoggle;
+      .MACRO22 : !s.stoggle;
+      TRUE : s.stoggle;
+    esac;
+  next(s.file@1) := !.MACRO14 & 
+    case
+      .MACRO19 : .MACRO25;
+      .MACRO22 : s.file@0 & !.MACRO0;
+      !.MACRO1 : s.req@1;
+      TRUE : s.file@1;
+    esac;
+  next(s.file@0) := .MACRO14 | 
+    case
+      .MACRO19 : !.MACRO25;
+      .MACRO22 : !.MACRO25;
+      !.MACRO1 : s.req@0;
+      TRUE : s.file@0;
+    esac;
+  next(s.rn) := !.MACRO14 & 
+    case
+      .MACRO19 : !.MACRO18;
+      .MACRO22 : !.MACRO18;
+      !.MACRO9 : TRUE;
+      TRUE : s.rn;
+    esac;
+  next(s.abusy) := !.MACRO14 & (s.abusy | !.MACRO1);
+  next(s.stimerTRUE_on) := .MACRO28 & .MACRO30 & !.MACRO19 & !.MACRO22 & (s.stimerTRUE_on | !.MACRO9);
+  next(s.stimerTRUE_enabled) := .MACRO28 & .MACRO30 & !.MACRO19 & !.MACRO22 & (.MACRO32 | s.stimerTRUE_enabled | .MACRO33);
+  next(s.spc@2) := .MACRO35 & .MACRO28 & .MACRO30 & 
+    case
+      .MACRO14 : !write_conf.empty;
+      .MACRO19 : FALSE;
+      .MACRO22 : FALSE;
+      !.MACRO9 : FALSE;
+      !.MACRO1 : FALSE;
+      TRUE : s.spc@2;
+    esac;
+  next(s.spc@1) := !.MACRO35 | .MACRO28 & .MACRO30 & 
+    case
+      .MACRO14 : write_conf.empty;
+      .MACRO19 : FALSE;
+      .MACRO22 : FALSE;
+      !.MACRO9 : TRUE;
+      !.MACRO1 : FALSE;
+      TRUE : s.spc@1;
+    esac;
+  next(s.spc@0) := !.MACRO35 | !.MACRO28 | .MACRO30 & 
+    case
+      .MACRO14 : write_conf.empty;
+      .MACRO19 : !.MACRO13;
+      .MACRO22 : !.MACRO13;
+      !.MACRO9 : FALSE;
+      !.MACRO1 : TRUE;
+      TRUE : s.spc@0;
+    esac;
+  next(s.stimer2_on) := .MACRO35 & (s.stimer2_on | .MACRO14 & (!write_conf.empty | !.MACRO14));
+  next(s.K_full) := .MACRO37 & (!.MACRO9 | s.K_full & !.MACRO33);
+  next(s.msg.first) := (s.K.first | .MACRO37) & (s.msg.first | !.MACRO37);
+  next(s.msg.last) := (s.K.last | .MACRO37) & (s.msg.last | !.MACRO37);
+  next(s.msg.toggle) := (s.K.toggle | .MACRO37) & (s.msg.toggle | !.MACRO37);
+  next(s.ind_full) := .MACRO38 | s.ind_full & (running@4 | running@3 | .MACRO39);
+  next(s.ind_indication@1) := .MACRO40 & (s.ind_indication@1 | .MACRO38);
+  next(s.ind_indication@0) := (!.MACRO38 | !s.msg.first & !s.msg.last) & (s.ind_indication@0 | .MACRO38);
+  next(s.rtoggle) := (!s.msg.toggle | !.MACRO38) & (s.rtoggle | .MACRO38);
+  next(s.data_is_safe) := s.data_is_safe;
+  next(s.L) := .MACRO41 | !.MACRO19 & !.MACRO22 & s.L & !.MACRO32;
+  next(s.ind_error) := .MACRO43 | s.ind_error & .MACRO46;
+  next(s.rfirst) := .MACRO43 | .MACRO40 & (s.rfirst | .MACRO38);
+  next(s.aerror) := !.MACRO43 & (!s.afirst | !.MACRO14) & (s.aerror | .MACRO14);
+  next(s.ctoggle) := .MACRO48 & (s.ctoggle | .MACRO38);
+  next(s.rpc@2) :=
+    case
+      !.MACRO48 : s.rfirst & s.rpc@2;
+      .MACRO43 : TRUE;
+      .MACRO41 : TRUE;
+      .MACRO38 : FALSE;
+      !.MACRO37 : FALSE;
+      TRUE : s.rpc@2;
+    esac;
+  next(s.rpc@1) :=
+    case
+      !.MACRO48 : s.rfirst & s.rpc@1;
+      .MACRO43 : FALSE;
+      .MACRO41 : FALSE;
+      .MACRO38 : TRUE;
+      !.MACRO37 : read_K.new;
+      TRUE : s.rpc@1;
+    esac;
+  next(s.rpc@0) :=
+    case
+      !.MACRO48 : s.rfirst & s.rpc@0;
+      .MACRO43 : FALSE;
+      .MACRO41 : FALSE;
+      .MACRO38 : FALSE;
+      !.MACRO37 : TRUE;
+      TRUE : s.rpc@0;
+    esac;
+  next(s.rtimer_on) :=
+    case
+      !.MACRO48 : s.rfirst & s.rtimer_on;
+      .MACRO43 : TRUE;
+      .MACRO41 : s.rtimer_on | !s.rpc@2 & s.rpc@1 & !s.rpc@0;
+      !.MACRO37 : !read_K.new & s.rtimer_on;
+      TRUE : s.rtimer_on;
+    esac;
+  next(s.stimer2_enabled) :=
+    case
+      !.MACRO48 : s.rfirst | s.stimer2_enabled;
+      .MACRO43 : TRUE;
+      !.MACRO35 : FALSE;
+      TRUE : s.stimer2_enabled;
+    esac;
+  next(s.rtimer_enabled) := .MACRO48 & (.MACRO50 | (!read_K.new & s.rtimer_enabled | .MACRO51) & (s.rtimer_enabled | !write_conf.empty | !.MACRO37 | .MACRO52)) & (s.rtimer_enabled | !.MACRO50 & (!.MACRO51 | !.MACRO52));
+  init(s.SAFE) := TRUE;
+  init(s.aerror) := FALSE;
+  init(s.afirst) := TRUE;
+  init(s.afile) := FALSE;
+  init(s.abusy) := FALSE;
+  init(s.data_is_safe) := TRUE;
+  init(s.rtimer_enabled) := FALSE;
+  init(s.rtimer_on) := TRUE;
+  init(s.msg.toggle) := FALSE;
+  init(s.msg.last) := FALSE;
+  init(s.msg.first) := FALSE;
+  init(s.ctoggle) := FALSE;
+  init(s.rtoggle) := FALSE;
+  init(s.rfirst) := TRUE;
+  init(s.ind_error) := FALSE;
+  init(s.ind_full) := FALSE;
+  init(s.stimer2_enabled) := FALSE;
+  init(s.stimer2_on) := FALSE;
+  init(s.stimerTRUE_enabled) := FALSE;
+  init(s.stimerTRUE_on) := FALSE;
+  init(s.rn) := FALSE;
+  init(s.file@1) := FALSE;
+  init(s.file@0) := TRUE;
+  init(s.stoggle) := FALSE;
+  init(s.sfirst) := TRUE;
+  init(s.conf_full) := FALSE;
+  init(s.req_full) := FALSE;
+  init(s.req@0) := FALSE;
+  init(s.L) := FALSE;
+  init(s.K_full) := FALSE;
+  init(s.K.toggle) := FALSE;
+  init(s.K.first) := FALSE;
+  init(s.K.last) := FALSE;
+  init(s.conf@1) := TRUE;
+  init(s.conf@0) := FALSE;
+  init(s.spc@2) := FALSE;
+  init(s.spc@1) := TRUE;
+  init(s.spc@0) := TRUE;
+  init(s.ind_indication@1) := FALSE;
+  init(s.ind_indication@0) := FALSE;
+  init(s.rpc@2) := TRUE;
+  init(s.rpc@1) := FALSE;
+  init(s.rpc@0) := FALSE;
+  next(s.req@0) := s.req@0 & !.MACRO5;
+INVAR
+  (!running@4 | !running@3 & (running@3 | !running@2)) &
+  (!s.req@1 | !s.req@0) &
+  (!s.conf@1 | !s.conf@0) &
+  (!s.spc@2 | !s.spc@1 & .MACRO53) &
+  (!s.file@1 | !s.file@0) &
+  (!s.ind_indication@1 | !s.ind_indication@0) &
+  (!s.rpc@2 | !s.rpc@1 & (s.rpc@1 | !s.rpc@0))
+TRANS
+  (read_K.new <-> !s.ctoggle | (next(s.msg.toggle) <-> s.rtoggle)) &
+  (
+  case
+    .MACRO38 : next(!s.ind_indication@1 | s.ind_indication@0);
+    .MACRO14 : FALSE;
+    !.MACRO1 : TRUE;
+    TRUE : s.afile;
+  esac <-> next(s.afile)) &
+  (
+  case
+    .MACRO43 : s.aerror;
+    .MACRO38 : s.data_is_safe & s.afile & .MACRO54 & (s.afirst | next(s.ind_indication@1) | next(s.ind_indication@0)) & (!s.afirst | next(s.ind_indication@1) | !next(s.ind_indication@0));
+    .MACRO14 : .MACRO54 & (!s.afile | !next(s.conf@1) | next(s.conf@0)) & (s.afile | next(s.conf@1) | !next(s.conf@0));
+    !.MACRO1 : !s.abusy;
+    TRUE : s.SAFE;
+  esac <-> next(s.SAFE)) &
+  (.MACRO43 | (!.MACRO38 | next(s.ind_indication@1) & !next(s.ind_indication@0)) & (s.afirst | .MACRO38) <-> next(s.afirst)) &
+  (running@3 | !running@1 | (!s.req_full | !running@4 | running@2 | !running@0) & (s.conf_full | running@4 | !running@2 | running@0) & (s.ind_full | running@4 | !running@2 | !running@0)) &
+  (s.ind_error | .MACRO46) &
+  (s.K_full | !.MACRO33) &
+  (s.L | !.MACRO32) &
+  (.MACRO1 | s.req_full & !s.spc@2 & s.spc@1 & s.spc@0) &
+  (.MACRO9 | !s.K_full & !s.spc@2 & !.MACRO53) &
+  (!.MACRO22 | .MACRO55) &
+  (!.MACRO19 | .MACRO55) &
+  (!.MACRO14 | !s.conf_full & !s.spc@2 & !s.spc@1 & !s.spc@0) &
+  (.MACRO30 | .MACRO58) &
+  (.MACRO28 | .MACRO58) &
+  (.MACRO35 | s.stimer2_enabled & s.stimer2_on) &
+  (.MACRO37 | s.K_full & s.rpc@2 & .MACRO59) &
+  (!.MACRO38 | !s.ind_full & !s.rpc@2 & s.rpc@1 & s.rpc@0) &
+  (!s.L & !s.rpc@2 & (s.rpc@1 <-> !s.rpc@0) | !.MACRO41) &
+  (!.MACRO43 | !s.ind_error & !s.rpc@2 & .MACRO59) &
+  (.MACRO48 | s.rtimer_enabled & s.rtimer_on) &
+  ((next(s.req@1) <-> s.req@1 | .MACRO5) | (next(s.req@1) <-> s.req@1 & !.MACRO5))
+SPEC
+  AG s.SAFE

@@ -1,0 +1,21 @@
+MODULE counter_cell(carry_in)
+ VAR
+   value : boolean;
+ ASSIGN
+   init(value) := FALSE;
+   next(value) := value | carry_in;
+ DEFINE
+  carry_out := value & carry_in;
+
+MODULE main
+ VAR
+   bit0 : counter_cell(TRUE);
+   bit1 : counter_cell(bit0.carry_out);
+   bit2 : counter_cell(bit1.carry_out);
+   bit3 : counter_cell(bit2.carry_out);
+   bit4 : counter_cell(bit3.carry_out);
+   bit5 : counter_cell(bit4.carry_out);
+   bit6 : counter_cell(bit5.carry_out);
+   bit7 : counter_cell(FALSE);
+ SPEC
+   AG ((! bit7.carry_out) | (! bit6.carry_out) | (bit5.carry_out) | (! bit4.carry_out) | (! bit3.carry_out) | (! bit2.carry_out) | (bit1.carry_out) | (! bit0.carry_out))

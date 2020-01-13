@@ -1,0 +1,38 @@
+MODULE main
+VAR
+  bit0.value : boolean;
+  bit1.value : boolean;
+  bit2.value : boolean;
+  bit3.value : boolean;
+  bit4.value : boolean;
+  bit5.value : boolean;
+  bit6.value : boolean;
+  bit7.value : boolean;
+DEFINE
+  bit0.carry_out := bit0.value;
+  bit1.carry_out := bit0.carry_out & bit1.value;
+  bit2.carry_out := bit1.carry_out & bit2.value;
+  bit3.carry_out := bit2.carry_out & bit3.value;
+  bit4.carry_out := bit3.carry_out & bit4.value;
+  bit5.carry_out := bit4.carry_out & bit5.value;
+  bit6.carry_out := bit5.carry_out & bit6.value;
+  bit7.carry_out := FALSE;
+ASSIGN
+  init(bit0.value) := FALSE;
+  next(bit0.value) := TRUE;
+  init(bit1.value) := FALSE;
+  next(bit1.value) := bit0.carry_out | bit1.value;
+  init(bit2.value) := FALSE;
+  next(bit2.value) := bit1.carry_out | bit2.value;
+  init(bit3.value) := FALSE;
+  next(bit3.value) := bit2.carry_out | bit3.value;
+  init(bit4.value) := FALSE;
+  next(bit4.value) := bit3.carry_out | bit4.value;
+  init(bit5.value) := FALSE;
+  next(bit5.value) := bit4.carry_out | bit5.value;
+  init(bit6.value) := FALSE;
+  next(bit6.value) := bit5.carry_out | bit6.value;
+  init(bit7.value) := FALSE;
+  next(bit7.value) := bit7.value;
+SPEC
+  AG (!bit0.carry_out | !bit1.carry_out | !bit2.carry_out | !bit3.carry_out | !bit4.carry_out | !bit5.carry_out | bit6.carry_out | bit7.carry_out)
